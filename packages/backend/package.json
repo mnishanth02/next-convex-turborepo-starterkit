@@ -5,13 +5,18 @@
   "description": "Convex Database and Functions for Next.js app",
   "scripts": {
     "dev": "convex dev",
-    "setup": "convex dev --until-success",
+    "deploy": "convex deploy",
+    "predev": "convex dev --until-success --once",
+    "typecheck": "tsc --noEmit --project convex/tsconfig.json",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
     "format": "biome format --write .",
-    "format:check": "biome format ."
+    "format:check": "biome format .",
+    "clean": "rm -rf .turbo node_modules"
   },
   "devDependencies": {
     "@types/node": "^24.6.2",
-    "typescript": "latest"
+    "typescript": "^5.9.3"
   },
   "exports": {
     "./convex/*": "./convex/*"

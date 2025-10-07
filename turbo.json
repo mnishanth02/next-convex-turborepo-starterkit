@@ -14,6 +14,17 @@
       "cache": false,
       "persistent": true
     },
+    "typecheck": {
+      "dependsOn": ["^typecheck"],
+      "outputs": []
+    },
+    "lint": {
+      "dependsOn": ["^lint"],
+      "outputs": []
+    },
+    "lint:fix": {
+      "cache": false
+    },
     "//#format": {
       "cache": true,
       "inputs": ["**/*.{js,jsx,ts,tsx,json,md,css}"]
