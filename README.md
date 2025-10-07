@@ -5,6 +5,11 @@ This template is for creating a monorepo with shadcn/ui.
 ## Usage
 
 ```bash
+git push origin main
+git push techlete main
+```
+
+```bash
 pnpm dlx shadcn@latest init
 ```
 
