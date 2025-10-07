@@ -1,9 +1,8 @@
 "use client";
 
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
-import { ChevronDownIcon } from "lucide-react";
-
 import { cn } from "@workspace/ui/lib/utils";
+import { ChevronDownIcon } from "lucide-react";
 
 function Accordion({
 	...props

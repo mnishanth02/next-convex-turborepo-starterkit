@@ -1,26 +1,26 @@
-"use client";
+"use client"
 
-import { buttonVariants } from "@workspace/ui/components/button";
-import { cn } from "@workspace/ui/lib/utils";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { type ReactNode, useEffect, useState } from "react";
+import { buttonVariants } from "@workspace/ui/components/button"
+import { cn } from "@workspace/ui/lib/utils"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { type ReactNode, useEffect, useState } from "react"
 
 export default function NotFound(): ReactNode {
-  const [countdown, setCountdown] = useState(5);
-  const router = useRouter();
+  const [countdown, setCountdown] = useState(5)
+  const router = useRouter()
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCountdown((prev) => prev - 1);
-    }, 1000);
+      setCountdown((prev) => prev - 1)
+    }, 1000)
 
     if (countdown === 0) {
-      router.push("/");
+      router.push("/")
     }
 
-    return () => clearInterval(interval);
-  }, [countdown, router]);
+    return () => clearInterval(interval)
+  }, [countdown, router])
 
   return (
     <div className="flex h-full min-h-screen w-full flex-1 flex-col items-center justify-center bg-background">
@@ -33,14 +33,14 @@ export default function NotFound(): ReactNode {
       </h3>
 
       <Link
-        className={ cn(
+        className={cn(
           buttonVariants({ variant: "default", size: "lg" }),
           "relative h-12 w-full min-w-[110px] max-w-[200px] items-center overflow-hidden rounded-full font-bold"
-        ) }
+        )}
         href="/"
       >
-        Go back home <span className="ml-2 font-bold">({ countdown })</span>
+        Go back home <span className="ml-2 font-bold">({countdown})</span>
       </Link>
     </div>
-  );
+  )
 }
