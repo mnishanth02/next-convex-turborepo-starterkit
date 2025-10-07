@@ -5,8 +5,14 @@ This template is for creating a monorepo with shadcn/ui.
 ## Usage
 
 ```bash
-git push origin main
-git push techlete main
+git push origin your-branch-name
+git push techlete your-branch-name
+
+git push origin your-branch-name
+git push techlete your-branch-name
+
+git fetch origin
+git fetch techlete
 ```
 
 ```bash
