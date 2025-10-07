@@ -7,9 +7,6 @@
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
     "check-types": {
       "dependsOn": ["^check-types"]
     },
@@ -27,7 +24,7 @@
     },
     "//#check": {
       "cache": true,
-      "inputs": ["**/*.{js,jsx,ts,tsx,json}"]
+      "inputs": ["**/*.{js,jsx,ts,tsx,json,css}"]
     },
     "//#check:fix": {
       "cache": false

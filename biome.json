@@ -1,5 +1,6 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+  "root": true,
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -47,6 +48,15 @@
       "indentWidth": 2
     }
   },
+  "css": {
+    "formatter": {
+      "enabled": true,
+      "indentWidth": 2
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
   "assist": {
     "enabled": true,
     "actions": {
@@ -67,7 +77,7 @@
       }
     },
     {
-      "includes": ["**/globals.css", "**/tailwind.css"],
+      "includes": ["**/*.css"],
       "linter": {
         "rules": {
           "suspicious": {
