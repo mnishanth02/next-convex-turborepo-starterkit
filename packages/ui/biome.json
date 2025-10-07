@@ -1,0 +1,42 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+	"root": false,
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"a11y": {
+				"useFocusableInteractive": "off",
+				"useSemanticElements": "warn",
+				"useKeyWithClickEvents": "warn",
+				"useAriaPropsForRole": "warn",
+				"noRedundantRoles": "warn"
+			},
+			"correctness": {
+				"noNestedComponentDefinitions": "warn",
+				"useExhaustiveDependencies": "warn"
+			},
+			"suspicious": {
+				"noArrayIndexKey": "warn",
+				"noDocumentCookie": "warn"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "warn"
+			}
+		}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.css"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noUnknownAtRules": "off"
+					},
+					"correctness": {
+						"noInvalidPositionAtImportRule": "off"
+					}
+				}
+			}
+		}
+	]
+}
