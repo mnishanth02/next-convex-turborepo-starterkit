@@ -1,16 +1,39 @@
-# Next.js + shadcn/ui Turborepo Template
+# Next.js + Convex + shadcn/ui Turborepo Template
 
 ## Architecture Overview
 
 This is a **pnpm workspace monorepo** using Turborepo for build orchestration. The structure separates concerns into:
 
 - **`apps/web`**: Next.js 15+ app (App Router) with React 19, Turbopack dev server
+- **`packages/backend`**: Convex database schema and functions (real-time backend-as-a-service)
 - **`packages/ui`**: Shared shadcn/ui component library with Tailwind CSS v4
 - **`packages/typescript-config`**: Shared TypeScript base configurations
 
-The UI package acts as a **centralized component library** - all shadcn components live in `packages/ui/src/components` and are imported via workspace protocol (`@workspace/ui/components/*`).
+### Key Architectural Decisions
+- **Convex as Backend**: Separate `packages/backend` contains all Convex schema, queries, and mutations. Frontend imports generated types via `@workspace/backend/convex/_generated/api`
+- **UI Centralization**: All shadcn components live in `packages/ui/src/components` and are imported via workspace protocol (`@workspace/ui/components/*`)
+- **Workspace Protocol**: Internal packages use `workspace:*` for type-safe cross-package dependencies
 
 ## Critical Workflows
+
+### Starting Development
+**Always run from repository root**:
+
+```bash
+pnpm dev  # Starts Next.js (Turbopack) + Convex dev server concurrently
+```
+
+This launches:
+- Next.js dev server on port 3000 (Turbopack enabled)
+- Convex dev server (watches schema/functions, auto-regenerates types)
+
+### Convex Backend Setup (First Time)
+```bash
+cd packages/backend
+npx convex dev  # Creates project, generates .env.local with deployment URL
+```
+
+Copy `NEXT_PUBLIC_CONVEX_URL` from `packages/backend/.env.local` to `apps/web/.env.local`
 
 ### Adding shadcn/ui Components
 **Always run from the repository root** and specify the web app as the target:
@@ -52,6 +75,45 @@ cd apps/web && pnpm typecheck    # Uses tsc --noEmit
 - **UI Utils**: `import { cn } from "@workspace/ui/lib/utils"`
 - **Styles**: `import "@workspace/ui/globals.css"` (in `app/layout.tsx` only, not per-component)
 - **App Internals**: `import { Providers } from "@/components/providers"` (uses `@/*` alias)
+- **Convex API**: `import { api } from "@workspace/backend/convex/_generated/api"`
+- **Convex Hooks**: `import { useQuery, useMutation } from "convex/react"`
+
+### Convex Function Patterns
+Use the **new function syntax** (see `packages/backend/convex/tasks.ts` for reference):
+
+```typescript
+import { query, mutation } from "./_generated/server"
+import { v } from "convex/values"
+
+export const myQuery = query({
+  args: { id: v.id("tasks") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id)
+  }
+})
+```
+
+**Best Practices** (from `tasks.ts`):
+- Use indexes for filtering: `.withIndex("by_status", (q) => q.eq("status", status))`
+- Always limit unbounded queries: `.take(100)` or use pagination
+- Return `null` for not found instead of throwing errors
+- Use compound indexes for complex queries (e.g., `by_user_and_status`)
+
+### React + Convex Integration
+Client components using Convex must be `"use client"`:
+
+```typescript
+"use client"
+import { useQuery, useMutation } from "convex/react"
+import { api } from "@workspace/backend/convex/_generated/api"
+
+export function TaskList() {
+  const tasks = useQuery(api.tasks.getAllTasks)
+  const createTask = useMutation(api.tasks.createTask)
+
+  return <div>{/* component */}</div>
+}
+```
 
 ### Workspace Dependencies
 All internal packages use `workspace:*` protocol in package.json. External dependencies should match versions across packages where shared (React 19.2.0, TypeScript 5.9.3, Next 15.5.4+).
@@ -73,7 +135,7 @@ All internal packages use `workspace:*` protocol in package.json. External depen
 ## Configuration Cascade
 - **TypeScript**: Root extends `@workspace/typescript-config/base.json`, apps extend `@workspace/typescript-config/nextjs.json`
 - **Path Aliases**: Apps configure `@/*` for app-relative imports and `@workspace/ui/*` for direct UI source imports
-- **Biome**: Root configuration at `biome.json` with `"root": true` for monorepo setup (see [Biome Configuration Guide](./docs/reference/biome-configuration.md))
+- **Biome**: Root configuration at `biome.json` with `"root": true` for monorepo setup
   - Only tool for formatting and linting (2 space indent, double quotes, semicolons as needed, ES5 trailing commas)
   - Linter rules: `useImportType` (error), `useNodejsImportProtocol` (error), `noUnusedVariables` (error), `noUnusedImports` (error)
   - Root configuration located at `biome.json`, configures entire monorepo with VCS integration and workspace includes
@@ -86,7 +148,10 @@ All internal packages use `workspace:*` protocol in package.json. External depen
 ## Key Files & Integration Points
 
 - **`apps/web/next.config.mjs`**: Must include `transpilePackages: ["@workspace/ui"]` to bundle workspace dependency
-- **`apps/web/components/providers.tsx`**: Client component wrapping `next-themes` ThemeProvider (required for SSR + hydration)
+- **`apps/web/components/providers.tsx`**: Client component wrapping `ConvexProvider` (with `ConvexReactClient`) and `next-themes` ThemeProvider (required for SSR + hydration)
+- **`packages/backend/convex/schema.ts`**: Convex database schema with table definitions and indexes
+- **`packages/backend/.env.local`**: Contains `CONVEX_DEPLOYMENT` and `CONVEX_DEPLOY_KEY` (gitignored)
+- **`apps/web/.env.local`**: Contains `NEXT_PUBLIC_CONVEX_URL` copied from backend (gitignored)
 - **`packages/ui/package.json`**: Uses granular `exports` field for subpath imports (components, lib, hooks, globals.css, postcss.config)
 - **`packages/ui/src/styles/globals.css`**: Tailwind v4 entry point with `@source` directives pointing to `apps/**` and `packages/ui/**`
 - **`turbo.json`**: Defines task dependencies (`^build` = "build dependencies first"), outputs, and cache behavior
@@ -109,7 +174,7 @@ All internal packages use `workspace:*` protocol in package.json. External depen
    - Add path aliases: `"@/*": ["./*"]`, `"@workspace/ui/*": ["../../packages/ui/src/*"]`
 6. Create `providers.tsx` with `"use client"` and `next-themes` setup
 7. **Biome Configuration**: No action needed - root config applies automatically!
-   - Only create `biome.json` if package-specific overrides are required (see [Biome Configuration Guide](./docs/reference/biome-configuration.md))
+   - Only create `biome.json` if package-specific overrides are required
 
 ## When Adding New Packages
 
@@ -118,7 +183,7 @@ All internal packages use `workspace:*` protocol in package.json. External depen
 3. Configure `tsconfig.json` extending appropriate base config from `@workspace/typescript-config`
 4. Add workspace dependencies as needed
 5. **Biome Configuration**: No action needed - root config applies automatically!
-   - Only create `biome.json` if package-specific overrides are required (see [Biome Configuration Guide](./docs/reference/biome-configuration.md))
+   - Only create `biome.json` if package-specific overrides are required
 
 ## Common Pitfalls
 
