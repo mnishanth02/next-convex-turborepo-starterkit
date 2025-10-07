@@ -6,15 +6,16 @@
 		"build": "turbo build",
 		"dev": "turbo dev",
 		"lint": "turbo lint",
-		"format": "prettier --write \"**/*.{ts,tsx,md}\""
+		"format": "biome format --write .",
+		"format:check": "biome format .",
+		"check": "biome check .",
+		"check:fix": "biome check --write ."
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.5",
-		"@workspace/eslint-config": "workspace:*",
 		"@workspace/typescript-config": "workspace:*",
-		"prettier": "^3.6.2",
-		"turbo": "^2.5.5",
-		"typescript": "5.7.3"
+		"turbo": "^2.5.8",
+		"typescript": "5.9.3"
 	},
 	"packageManager": "pnpm@10.4.1",
 	"engines": {

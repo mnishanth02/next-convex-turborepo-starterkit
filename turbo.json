@@ -16,6 +16,21 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "//#format": {
+      "cache": true,
+      "inputs": ["**/*.{js,jsx,ts,tsx,json,md,css}"]
+    },
+    "//#format:check": {
+      "cache": true,
+      "inputs": ["**/*.{js,jsx,ts,tsx,json,md,css}"]
+    },
+    "//#check": {
+      "cache": true,
+      "inputs": ["**/*.{js,jsx,ts,tsx,json}"]
+    },
+    "//#check:fix": {
+      "cache": false
     }
   }
 }
